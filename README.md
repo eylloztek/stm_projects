@@ -1,5 +1,5 @@
-# 00_Hello_World - LED Blink Project
-
+<details>
+<summary># 00_Hello_World - LED Blink Project</summary>
 This project demonstrates how to toggle a green LED connected to a GPIO pin using STM32 HAL functions with the STM32CubeIDE development environment. The LED blinks with a 500 ms delay interval.
 
 ## 🛠️ Hardware
@@ -38,6 +38,8 @@ GPIO_InitStruct.Pull = GPIO_NOPULL;
 GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
 HAL_GPIO_Init(green_led_GPIO_Port, &GPIO_InitStruct);
 ```
+
+</details>
 
 
 
