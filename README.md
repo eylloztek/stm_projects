@@ -240,3 +240,290 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
 </details>
 
+<details>
+  <summary><h3> 04_UART - UART Communication (Transmit & Receive) </h3></summary>
+
+  This STM32CubeIDE project demonstrates basic UART communication using the STM32 Nucleo-F446RE board. The system waits for a 5-byte message over UART and responds with a predefined message once received.
+
+## 🔧 Hardware
+
+- **Board:** STM32 Nucleo-F446RE  
+- **Communication Interface:** UART2 (TX/RX)  
+- **Optional Output:** LED (status or activity indicator)
+
+## 🛠️ Development Environment
+
+- **IDE:** STM32CubeIDE  
+- **Toolchain:** STM32 HAL  
+- **Language:** C
+
+## ⚙️ Functionality
+
+- Initializes UART2 at 115200 baud rate.
+- Waits for a 5-byte message via UART (blocking mode).
+- Once the message is received, it transmits `"Hello!\r\n"` back over UART.
+
+### 💬 UART Operation
+
+```c
+uint8_t messageTX[] = "Hello! \r\n";
+uint8_t messageRX[5];
+
+if (HAL_UART_Receive(&huart2, messageRX, sizeof(messageRX), HAL_MAX_DELAY) == HAL_OK) {
+    HAL_UART_Transmit(&huart2, messageTX, sizeof(messageTX), HAL_MAX_DELAY);
+}
+```
+
+## 🧠 UART2 Configuration
+
+| Parameter    | Value  |
+| ------------ | ------ |
+| Baud Rate    | 115200 |
+| Word Length  | 8 bits |
+| Stop Bits    | 1      |
+| Parity       | None   |
+| Flow Control | None   |
+| Mode         | TX/RX  |
+
+## 🔌 Pin Configuration
+
+![image](https://github.com/user-attachments/assets/9fe9c09f-c909-4cab-8330-9950882bd100)
+
+| UART Function | STM32 Pin | Nucleo Pin Header |
+| ------------- | --------- | ----------------- |
+| TX (USART2)   | PA2       | D1                |
+| RX (USART2)   | PA3       | D0                |
+
+
+## 🧪 How to Test
+Open a terminal tool (like PuTTY, TeraTerm, or STM32CubeMonitor).
+
+Connect to the Nucleo board's virtual COM port at `115200 8N1`.
+
+Send any 5-byte string (e.g., `12345`).
+
+You will receive `Hello!` as a response over UART.
+
+</details>
+
+<details>
+  <summary><h3> 05_UART_Interrupt - UART Command-Controlled LED </h3></summary>
+
+  This STM32 project demonstrates UART-based LED control on the STM32 Nucleo-F446RE board. It allows you to send textual commands (`on`, `off`, or `blink <time>`) to control an onboard LED through a serial terminal.
+
+## 🔧 Hardware
+
+- **Board:** STM32 Nucleo-F446RE   
+- **Peripheral Used:** UART2 (TX/RX), GPIO (LED Control)  
+
+## 🛠️ Development Environment
+
+- **IDE:** STM32CubeIDE  
+- **Library:** STM32 HAL (Hardware Abstraction Layer)  
+- **Language:** C
+
+## 🚀 Features
+
+- **Non-blocking UART Reception (Interrupt-based)**
+- **Command Parsing**
+- **LED Control**
+- **Dynamic LED Blink Duration**
+
+## 📡 UART Commands
+
+| Command         | Description                             |
+|-----------------|-----------------------------------------|
+| `on`            | Turns the LED **on**                    |
+| `off`           | Turns the LED **off**                   |
+| `blink <time>`  | Turns on the LED for `<time>` seconds   |
+
+> Example: Sending `blink 3` via serial will turn the LED on for 3 seconds.
+
+## ⚙️ Code Explanation
+
+- UART receive is configured in **interrupt mode** using `HAL_UART_Receive_IT`.
+- Incoming characters are accumulated into a buffer until a recognizable command is detected.
+- Upon recognizing:
+  - `"on"`: LED is turned **on**
+  - `"off"`: LED is turned **off**
+  - `"blink <time>"`: LED turns **on for `<time>` seconds**, then off
+
+```c
+// Example: Handling "blink 2"
+if (strncmp(messageBuffer, "blink ", 6) == 0) {
+    blinkTime = atoi(&messageBuffer[6]);  // parse "2"
+    interruptFlag = 1;
+}
+```
+
+The blinking is handled in the main loop using:
+
+```c
+if(interruptFlag){
+    HAL_GPIO_WritePin(led_GPIO_Port, led_Pin, 1);
+    HAL_Delay(blinkTime * 1000);
+    HAL_GPIO_WritePin(led_GPIO_Port, led_Pin, 0);
+    interruptFlag = 0;
+}
+```
+
+## 🔌 Pin Configuration
+
+![image](https://github.com/user-attachments/assets/5e9a9cf2-ff94-4482-aa9d-d278d47d52ce)
+
+| Function | STM32 Pin | Nucleo Pin |
+| -------- | --------- | ---------- |
+| TX       | PA2       | D1         |
+| RX       | PA3       | D0         |
+
+## 🧪 How to Use
+1. Flash the code to your STM32 Nucleo-F446RE.
+2. Open a serial terminal (e.g., PuTTY, Tera Term).
+3. Set Baud rate to 115200.
+4. Send the following commands:
+- on
+- off
+- blink 5
+
+The LED will behave accordingly.
+
+## 📌 Notes
+Input buffer size is `10 bytes`.
+
+All commands must fit within the buffer.
+
+The program resets the buffer after each recognized command.
+
+Uses `string.h` and `stdlib.h` for parsing and comparison.
+</details>
+
+<details>
+  <summary><h3> Register_Level_1 - Bare-Metal LED Blink </h3></summary>
+
+  This project demonstrates how to toggle an LED using STM32F4 microcontroller registers directly without relying on the HAL (Hardware Abstraction Layer) or CMSIS drivers. The LED connected to **PA5** (typically the onboard LED on STM32F4 Discovery/Nucleo boards) is toggled with a simple software delay.
+
+## 🛠️ Hardware Requirements
+
+- **Board:** STM32 Nucleo-F446RE
+- **LED Connection:** Onboard LED at **GPIOA Pin 5**
+
+## 💻 Software Requirements
+
+- **IDE:** STM32CubeIDE
+- **No HAL or CMSIS functions used**
+- Pure register-level programming
+
+## 🚀 What This Code Does
+
+1. Enables the clock for **GPIOA**.
+2. Configures **PA5** as:
+   - Output mode
+   - Push-pull type
+   - High-speed
+   - No pull-up/pull-down
+3. Enters an infinite loop:
+   - Sets **PA5 high** (turn LED on)
+   - Waits using a crude software delay loop
+   - Sets **PA5 low** (turn LED off)
+   - Waits again
+
+## 🔧 Register Configuration Breakdown
+
+```c
+RCC->AHB1ENR |= (1<<0);           // Enable clock to GPIOA
+GPIOA->MODER &= ~(3<<(5*2));      // Clear mode bits for PA5
+GPIOA->MODER |= (1<<(5*2));       // Set PA5 as output (01)
+GPIOA->OTYPER &= ~(1<<5);         // Push-pull output
+GPIOA->OSPEEDR |= (3<<(5*2));     // High speed
+GPIOA->PUPDR &= ~(3<<(5*2));      // No pull-up/pull-down
+```
+
+## 💡 LED Blinking Loop
+
+```c
+GPIOA->ODR |= (1<<5);             // LED ON
+for (int i = 0; i < 1000000; ++i); // Delay
+GPIOA->ODR &= ~(1<<5);            // LED OFF
+for (int i = 0; i < 1000000; ++i); // Delay
+```
+## ⚠️ Notes
+- This code uses bare-metal programming: no HAL, no interrupts, no external libraries.
+- The LED blinking is based on an inaccurate software delay — use hardware timers for better control.
+- PA5 is typically connected to the onboard LED on most STM32F4 boards, but verify your board’s pinout.
+
+## ✅ Benefits of Register-Level Programming
+- Smaller binary size
+- Maximum control over hardware
+- Useful for bootloaders or performance-critical code
+
+## ❌ Limitations
+- No abstraction: less portable
+- More error-prone
+- No safety checks
+</details>
+
+<details>
+  <summary><h3> Register_Level_2 - Button Controlled LED (Bare-Metal GPIO)</h3></summary>
+
+  This project demonstrates how to control an LED connected to **GPIOA Pin 5** using a **button connected to GPIOC Pin 13**, implemented at the register level (bare-metal) without using the HAL or CMSIS abstraction layers.
+
+## 🛠️ Hardware Requirements
+
+- **Development Board:** STM32 Nucleo-F446RE
+- **Button:** Connected to **PC13** (typically the blue push button on Nucleo boards)
+- **LED:** Connected to **PA5** (typically the onboard LED)
+
+## 💻 Software Requirements
+
+- **IDE:** STM32CubeIDE
+- **No HAL/CMSIS functions used**
+- **Pure register-level code**
+
+## 🚀 Project Functionality
+
+1. Configures **PC13** as a digital input with **pull-up resistor**.
+2. Configures **PA5** as a digital output.
+3. Continuously reads the state of the button:
+   - If the button is **pressed** (PC13 pulled LOW), the LED on **PA5** is **turned on**.
+   - If the button is **not pressed** (PC13 HIGH), the LED is **turned off**.
+
+## 🔧 Register Configuration Summary
+
+### Button (PC13) Configuration
+
+```c
+RCC->AHB1ENR |= (1 << 2);               // Enable clock for GPIOC
+GPIOC->MODER &= ~(3 << (13 * 2));       // Set PC13 as input
+GPIOC->PUPDR &= ~(3 << (13 * 2));       // Clear pull-up/down bits
+GPIOC->PUPDR |= (1 << (13 * 2));        // Enable pull-up
+```
+
+### LED (PA5) Configuration
+
+```c
+RCC->AHB1ENR |= (1 << 0);               // Enable clock for GPIOA
+GPIOA->MODER &= ~(3 << (5 * 2));        // Clear PA5 mode bits
+GPIOA->MODER |= (1 << (5 * 2));         // Set PA5 as output
+GPIOA->OTYPER &= ~(1 << 5);             // Push-pull
+GPIOA->OSPEEDR |= (3 << (5 * 2));       // High speed
+GPIOA->PUPDR &= ~(3 << (5 * 2));        // No pull-up/pull-down
+```
+
+## 🔄 Main Loop Logic
+
+```c
+while (1) {
+    if (!(GPIOC->IDR & (1 << 13))) {
+        GPIOA->ODR |= (1 << 5);  // Turn LED on
+    } else {
+        GPIOA->ODR &= ~(1 << 5); // Turn LED off
+    }
+}
+```
+
+## ⚠️ Notes
+- PC13 is connected to the user button on many Nucleo boards.
+- No debouncing is implemented — for real-world use, software or hardware debouncing may be required.
+- You can easily adapt this example to other pins or external buttons/LEDs.
+
+</details>
