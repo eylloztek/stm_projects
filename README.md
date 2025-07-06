@@ -1,5 +1,5 @@
 <details>
-<summary> <h3></h3> 00_Hello_World - LED Blink Project</h3></summary>
+<summary> <h3> 00_Hello_World - LED Blink Project </h3></summary>
   
 This project demonstrates how to toggle a green LED connected to a GPIO pin using STM32 HAL functions with the STM32CubeIDE development environment. The LED blinks with a 500 ms delay interval.
 
@@ -104,6 +104,138 @@ GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
 HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 ```
 
+</details>
+
+<details>
+  <summary><h3> 02_Button - Button-Controlled LED Counter </h3></summary>
+
+  This STM32CubeIDE project demonstrates how to use a push button to increment a counter and control multiple LEDs connected to GPIO pins on the STM32 Nucleo-F446RE board. The number of active LEDs increases with each button press, cycling through four stages.
+
+## 🛠️ Hardware
+
+- **Board:** STM32 Nucleo-F446RE  
+- **Microcontroller:** STM32F446RE (ARM Cortex-M4)  
+- **Input:** 1 Push Button (Pull-up enabled)  
+- **Output:** 4 LEDs (connected to GPIOA pins PA6, PA7, PA9, PA8)  
+- **Status LED:** `green_led_Pin` for button press indication
+
+## 💻 Development Environment
+
+- **IDE:** STM32CubeIDE  
+- **Toolchain:** STM32 HAL (Hardware Abstraction Layer)  
+- **Language:** C
+
+## ⚙️ Functionality
+
+- The program monitors a button connected to a GPIO pin (`button_Pin`) with pull-up enabled.
+- When the button is pressed (logic low), a counter (`buttonCounter`) is incremented.
+- The green LED is turned ON while the button is pressed.
+- Based on the modulo of the counter (`buttonCounter % 4`), a set number of LEDs are turned ON:
+  - 0 → 1 LED ON (PA6)
+  - 1 → 2 LEDs ON (PA6, PA7)
+  - 2 → 3 LEDs ON (PA6, PA7, PA9)
+  - 3 → 4 LEDs ON (PA6, PA7, PA9, PA8)
+- After 4 presses, the counter resets to the beginning of the cycle.
+
+### 🔁 LED Sequence Logic (simplified)
+
+```c
+if (buttonCounter % 4 == 0) {
+  LED1 = ON
+} else if (buttonCounter % 4 == 1) {
+  LED1, LED2 = ON
+} else if (buttonCounter % 4 == 2) {
+  LED1, LED2, LED3 = ON
+} else if (buttonCounter % 4 == 3) {
+  LED1, LED2, LED3, LED4 = ON
+}
+```
+
+## 🔌 Pin Configuration
+
+![image](https://github.com/user-attachments/assets/2b4b777b-ea3d-4060-8b54-da1cbcc4d326)
+
+| Purpose      | GPIO Pin                    |
+| ------------ | --------------------------- |
+| Button Input | `button_Pin` (with pull-up) |
+| Status LED   | `green_led_Pin` (GPIOA)     |
+| Output LEDs  | `PA6`, `PA7`, `PA9`, `PA8`  |
+
+These pins are configured as follows:
+
+Input (button): `GPIO_MODE_INPUT`, `GPIO_PULLUP`
+
+Output (LEDs): `GPIO_MODE_OUTPUT_PP`, `GPIO_NOPULL`, `MEDIUM` speed
+
+</details>
+
+<details>
+  <summary> <h3> 03_External_Interrupt - External Interrupt LED Blink</h3></summary>
+
+  This STM32CubeIDE project demonstrates the use of external interrupts (EXTI) on the STM32 Nucleo-F446RE board. A user button triggers an interrupt that causes a faster LED blinking sequence in addition to the default blinking pattern.
+
+## 🛠️ Hardware
+
+- **Board:** STM32 Nucleo-F446RE  
+- **Microcontroller:** STM32F446RE (ARM Cortex-M4)  
+- **Input:** Push Button connected to `PC13` (default user button)  
+- **Output:** LED connected to custom GPIO pin (`led_Pin`)  
+
+## 💻 Development Environment
+
+- **IDE:** STM32CubeIDE  
+- **Toolchain:** STM32 HAL  
+- **Language:** C
+
+## ⚙️ Functionality
+
+- The LED toggles every 500 ms by default.
+- When the user presses the button (attached to `PC13`), an **external interrupt (EXTI)** is triggered.
+- The interrupt sets a flag `interruptFlag`.
+- In the next loop cycle, the LED blinks **rapidly 5 times** (100 ms interval) as a response to the interrupt.
+
+### 🔁 LED Blink Logic
+
+```c
+// Default blink every 500 ms
+HAL_GPIO_TogglePin(led_GPIO_Port, led_Pin);
+HAL_Delay(500);
+
+// On interrupt
+if (interruptFlag) {
+    interruptFlag = 0;
+    for (int i = 0; i < 5; i++) {
+        HAL_GPIO_TogglePin(led_GPIO_Port, led_Pin);
+        HAL_Delay(100);
+    }
+}
+```
+
+## ⏱️ External Interrupt Setup
+Button Pin: `buton_Pin` mapped to `PC13`
+
+Trigger: Rising edge (`GPIO_MODE_IT_RISING`)
+
+Pull Configuration: Pull-up enabled (`GPIO_PULLUP`)
+
+Interrupt Handler: `HAL_GPIO_EXTI_Callback()`
+
+```c
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+    if (GPIO_Pin == GPIO_PIN_13) {
+        interruptFlag = 1;
+    }
+}
+```
+
+## 🔌 Pin Configuration
+
+![image](https://github.com/user-attachments/assets/df0388df-9cbb-4182-8433-941425fa8412)
+
+| Purpose      | Pin       | Mode                   |
+| ------------ | --------- | ---------------------- |
+| LED Output   | `led_Pin` | GPIO\_MODE\_OUTPUT\_PP |
+| Button Input | `PC13`    | GPIO\_MODE\_IT\_RISING |
 
 
 </details>
