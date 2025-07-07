@@ -1,5 +1,5 @@
 <details>
-<summary> <h3> 00_Hello_World - LED Blink Project </h3></summary>
+<summary> <h2> 00_Hello_World - LED Blink Project </h2></summary>
   
 This project demonstrates how to toggle a green LED connected to a GPIO pin using STM32 HAL functions with the STM32CubeIDE development environment. The LED blinks with a 500 ms delay interval.
 
@@ -43,7 +43,7 @@ HAL_GPIO_Init(green_led_GPIO_Port, &GPIO_InitStruct);
 </details>
 
 <details>
-  <summary><h3> 01_Knight_Rider - LED Animation Project</h3></summary>
+  <summary><h2> 01_Knight_Rider - LED Animation Project</h2></summary>
 
   This project demonstrates how to control multiple LEDs connected to GPIO pins on an STM32 Nucleo-F446RE board using STM32 HAL. The LEDs blink in a forward and backward sequence, creating a simple "running light" or "bouncing" LED animation.
 
@@ -107,7 +107,7 @@ HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 </details>
 
 <details>
-  <summary><h3> 02_Button - Button-Controlled LED Counter </h3></summary>
+  <summary><h2> 02_Button - Button-Controlled LED Counter </h2></summary>
 
   This STM32CubeIDE project demonstrates how to use a push button to increment a counter and control multiple LEDs connected to GPIO pins on the STM32 Nucleo-F446RE board. The number of active LEDs increases with each button press, cycling through four stages.
 
@@ -170,7 +170,7 @@ Output (LEDs): `GPIO_MODE_OUTPUT_PP`, `GPIO_NOPULL`, `MEDIUM` speed
 </details>
 
 <details>
-  <summary> <h3> 03_External_Interrupt - External Interrupt LED Blink</h3></summary>
+  <summary> <h2> 03_External_Interrupt - External Interrupt LED Blink</h2></summary>
 
   This STM32CubeIDE project demonstrates the use of external interrupts (EXTI) on the STM32 Nucleo-F446RE board. A user button triggers an interrupt that causes a faster LED blinking sequence in addition to the default blinking pattern.
 
@@ -241,7 +241,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 </details>
 
 <details>
-  <summary><h3> 04_UART - UART Communication (Transmit & Receive) </h3></summary>
+  <summary><h2> 04_UART - UART Communication (Transmit & Receive) </h2></summary>
 
   This STM32CubeIDE project demonstrates basic UART communication using the STM32 Nucleo-F446RE board. The system waits for a 5-byte message over UART and responds with a predefined message once received.
 
@@ -307,7 +307,7 @@ You will receive `Hello!` as a response over UART.
 </details>
 
 <details>
-  <summary><h3> 05_UART_Interrupt - UART Command-Controlled LED </h3></summary>
+  <summary><h2> 05_UART_Interrupt - UART Command-Controlled LED </h2></summary>
 
   This STM32 project demonstrates UART-based LED control on the STM32 Nucleo-F446RE board. It allows you to send textual commands (`on`, `off`, or `blink <time>`) to control an onboard LED through a serial terminal.
 
@@ -398,7 +398,57 @@ Uses `string.h` and `stdlib.h` for parsing and comparison.
 </details>
 
 <details>
-  <summary><h3> Register_Level_1 - Bare-Metal LED Blink </h3></summary>
+  <summary><h2> 06_Bluetooth_Module - HM-10 Bluetooth UART Communication </h2></summary>
+
+  This project demonstrates **Bluetooth communication between an STM32F4 microcontroller and a smartphone** using the **HM-10 Bluetooth module** over **USART1**. The STM32 receives data sent from the phone and immediately echoes it back, enabling two-way Bluetooth-based serial communication.
+
+## 🔧 Hardware Requirements
+
+- 📶 **Bluetooth Module:** HM-10 (BLE)
+- 🎛 **Board:** STM32 Nucleo-F446RE 
+- 📡 **Communication:** UART (USART1)
+- 🧠 **Library:** STM32 HAL (Hardware Abstraction Layer)
+- 📲 **Phone App:** Any Bluetooth serial terminal (e.g., Serial Bluetooth Terminal on Android, BLESerial tiny on iOS)
+
+## 🔌 Connections
+
+| HM-10 Pin | Connects To STM32 |
+|-----------|-------------------|
+| VCC       | 3.3V              |
+| GND       | GND               |
+| TXD       | RX (e.g., PA10 - USART1 RX) |
+| RXD       | TX (e.g., PA9  - USART1 TX) |
+
+> ⚠️ **Note:** HM-10 uses 3.3V logic. Do not connect to 5V TX lines directly without a voltage divider or level shifter.
+
+## 💡 How It Works
+
+- The HM-10 module is paired with a smartphone.
+- Data sent from the phone is received by STM32 via **USART1**.
+- The microcontroller echoes the data back to the phone.
+- This forms a simple Bluetooth serial communication loop.
+
+### UART Settings
+
+| Parameter     | Value     |
+|---------------|-----------|
+| Baud Rate     | 9600      |
+| Data Bits     | 8         |
+| Stop Bits     | 1         |
+| Parity        | None      |
+| Flow Control  | None      |
+
+## 📟 Code Behavior
+
+```c
+uint8_t message[10];
+HAL_UART_Receive(&huart1, message, 10, 1000);  // Receive 10 bytes from HM-10
+HAL_UART_Transmit(&huart1, message, 10, 1000); // Echo it back to the phone
+```
+</details>
+
+<details>
+  <summary><h2> Register_Level_1 - Bare-Metal LED Blink </h2></summary>
 
   This project demonstrates how to toggle an LED using STM32F4 microcontroller registers directly without relying on the HAL (Hardware Abstraction Layer) or CMSIS drivers. The LED connected to **PA5** (typically the onboard LED on STM32F4 Discovery/Nucleo boards) is toggled with a simple software delay.
 
@@ -463,7 +513,7 @@ for (int i = 0; i < 1000000; ++i); // Delay
 </details>
 
 <details>
-  <summary><h3> Register_Level_2 - Button Controlled LED (Bare-Metal GPIO)</h3></summary>
+  <summary><h2> Register_Level_2 - Button Controlled LED (Bare-Metal GPIO)</h2></summary>
 
   This project demonstrates how to control an LED connected to **GPIOA Pin 5** using a **button connected to GPIOC Pin 13**, implemented at the register level (bare-metal) without using the HAL or CMSIS abstraction layers.
 
