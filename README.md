@@ -410,7 +410,7 @@ Uses `string.h` and `stdlib.h` for parsing and comparison.
 - 🧠 **Library:** STM32 HAL (Hardware Abstraction Layer)
 - 📲 **Phone App:** Any Bluetooth serial terminal (e.g., Serial Bluetooth Terminal on Android, BLESerial tiny on iOS)
 
-## 🔌 Connections
+## 🔌 Pin Configuration
 
 | HM-10 Pin | Connects To STM32 |
 |-----------|-------------------|
@@ -420,6 +420,9 @@ Uses `string.h` and `stdlib.h` for parsing and comparison.
 | RXD       | TX (e.g., PA9  - USART1 TX) |
 
 > ⚠️ **Note:** HM-10 uses 3.3V logic. Do not connect to 5V TX lines directly without a voltage divider or level shifter.
+
+![image](https://github.com/user-attachments/assets/25b97a5d-ef52-4079-b110-836183270cad)
+
 
 ## 💡 How It Works
 
