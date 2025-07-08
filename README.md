@@ -451,6 +451,76 @@ HAL_UART_Transmit(&huart1, message, 10, 1000); // Echo it back to the phone
 </details>
 
 <details>
+  <summary> <h2> 07_ADC_Internal_Temp_Sensor - Internal Temperature Sensor Reading via ADC </h2></summary>
+
+  This project demonstrates how to measure the **internal temperature** of the **STM32 Nucleo-F446RE** board using its **built-in temperature sensor** via **ADC1**. The temperature is read, converted to degrees Celsius, and sent over **USART2** to a serial terminal.
+
+## 🔧 Hardware Used
+
+- 💻 **Microcontroller Board:** STM32 Nucleo-F446RE  
+- 🌡 **Sensor:** Internal temperature sensor of STM32F446RE  
+- 📠 **Communication Interface:** UART (USART2)  
+
+## 📐 How It Works
+
+1. The internal temperature sensor provides a voltage (`VSENSE`) proportional to the chip's temperature.
+2. This voltage is read using the ADC (Analog-to-Digital Converter).
+3. The value is converted to Celsius using the formula provided in the STM32 reference manual:
+
+   T(°C) = ((VSENSE - V25) / Avg_Slope) + 25
+
+   Where:
+   
+  | Parameter   | Description                             | Value / Formula              |
+  | ----------- | --------------------------------------- | ---------------------------- |
+  | `VSENSE`    | Voltage corresponding to ADC reading    | `ADC_Value * VSTEP`  |
+  | `V25`       | Voltage at 25°C (factory-calibrated)    | `0.76 V`                     |
+  | `Avg_Slope` | Average slope of the temperature sensor | `2.5 mV/°C` or `0.0025 V/°C` |
+  | `VSTEP`      | Reference voltage used by ADC           | `3.3 / 4096`                      |
+
+
+## 📟 UART Output
+
+The converted temperature is sent every second over UART using `HAL_UART_Transmit()`.
+
+Example output seen in a serial terminal:
+
+<img width="209" alt="image" src="https://github.com/user-attachments/assets/78c9f076-7518-4cd5-833f-c063fdc54bae" />
+
+## 🔁 Main Loop Behavior
+
+```c
+while (1) {
+    temperature = readTemperature(&adcValue);
+    sprintf(buffer, "Temperature: %.2f °C\r\n", temperature);
+    HAL_UART_Transmit(&huart2, (uint8_t*)buffer, strlen(buffer), HAL_MAX_DELAY);
+    HAL_Delay(1000);
+}
+```
+
+## ⚙️ Configuration
+
+| Peripheral | Parameter          | Value                    |
+| ---------- | ------------------ | ------------------------ |
+| **ADC1**   | Channel            | `ADC_CHANNEL_TEMPSENSOR` |
+|            | Resolution         | `12-bit`                 |
+|            | Sample Time        | `112 cycles`             |
+|            | Conversion Mode    | `Single conversion`      |
+|            | Trigger            | `Software start`         |
+|            | Continuous Mode    | `Enabled`                |
+|            | Data Alignment     | `Right`                  |
+|            | VREF               | `3.3V`                   |
+| **USART2** | Baud Rate          | `115200`                 |
+|            | Word Length        | `8 bits`                 |
+|            | Stop Bits          | `1`                      |
+|            | Parity             | `None`                   |
+|            | Mode               | `TX/RX`                  |
+|            | Hardware Flow Ctrl | `None`                   |
+
+
+</details>
+
+<details>
   <summary><h2> Register_Level_1 - Bare-Metal LED Blink </h2></summary>
 
   This project demonstrates how to toggle an LED using STM32F4 microcontroller registers directly without relying on the HAL (Hardware Abstraction Layer) or CMSIS drivers. The LED connected to **PA5** (typically the onboard LED on STM32F4 Discovery/Nucleo boards) is toggled with a simple software delay.
